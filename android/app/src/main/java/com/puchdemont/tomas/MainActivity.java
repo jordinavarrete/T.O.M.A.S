@@ -14,9 +14,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private String NET_IDENTIFIER = "TOMASNET";
+    private int CURRENT_VERSION_ID = -1;
+    private boolean CURRENT_DATA = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +69,50 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleScanResults() {
         try {
+            ArrayList<ScanResult> candidates = new ArrayList<ScanResult>();
             WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
             if (wifiManager != null) {
                 List<ScanResult> wifiList = wifiManager.getScanResults();
                 for (ScanResult wifi : wifiList) {
-                    Log.e("WiFiScan", "SSID: " + wifi.SSID + ", Signal Strength: " + wifi.level);
+                    if (wifi.SSID.startsWith(NET_IDENTIFIER)) {
+                        if (wifi.SSID.chars().filter(ch -> ch == '#').count() == 2)
+                        {
+                            int current_ver = Integer.parseInt(wifi.SSID.split("#")[1]);
+                            if(current_ver > CURRENT_VERSION_ID) {
+                                candidates.add(wifi);
+                            }
+                            else {
+                                Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" is not newer than the current data (" + current_ver + " <= " + CURRENT_VERSION_ID + ")");
+                            }
+                        }
+                        else {
+                            Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" does not match the NET_ID#{NUM}#DEV_UUID pattern ");
+                        }
+                    }
+                    else {
+                        Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" does not start with " + NET_IDENTIFIER);
+                    }
                 }
-                wifiManager.startScan();
+
+                if(candidates.isEmpty())
+                {
+                    Log.d("WiFiScan", "No compatible wifi versions found, will scan again");
+                    new android.os.Handler().postDelayed(wifiManager::startScan, 5000);
+                }
+                else
+                {
+                    Log.d("WiFiScan", "Found " + candidates.size() + " candidates");
+                    unregisterReceiver(wifiScanReceiver);
+                    connectToWifiAndGetData(candidates.get(0));
+                }
             }
         } catch (Exception ex) {
             Log.e("WiFiScan", "Error handling WiFi scan results: " + ex.getMessage());
         }
+    }
+
+    private void connectToWifiAndGetData(ScanResult Network)
+    {
+        Log.e("WiFiScan", "Connecting to wifi network " + Network.SSID);
     }
 }
