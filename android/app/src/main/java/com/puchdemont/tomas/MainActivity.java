@@ -1,12 +1,20 @@
 package com.puchdemont.tomas;
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
-
+import android.util.Log;
+import android.content.IntentFilter;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,5 +28,52 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+
+        registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        wifiManager.startScan();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(wifiScanReceiver);
+    }
+
+    private final BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
+                handleScanResults();
+            }
+        }
+    };
+
+    private void handleScanResults() {
+        try {
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            if (wifiManager != null) {
+                List<ScanResult> wifiList = wifiManager.getScanResults();
+                for (ScanResult wifi : wifiList) {
+                    Log.e("WiFiScan", "SSID: " + wifi.SSID + ", Signal Strength: " + wifi.level);
+                }
+                wifiManager.startScan();
+            }
+        } catch (Exception ex) {
+            Log.e("WiFiScan", "Error handling WiFi scan results: " + ex.getMessage());
+        }
     }
 }
