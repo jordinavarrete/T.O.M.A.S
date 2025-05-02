@@ -1,0 +1,31 @@
+{
+  "airportMetadata":{
+    "ICAO":"LEBL",
+    "IATA":"BCN",
+    "presentName":"Aeroport El Praat-Josep Tarradellas",
+    "lastUpdateTimestamp":"0",
+    "startUpdateTimestamp":"0"
+  },
+
+  "flights":[
+    {
+      "type":"departure",
+      "programmedArriveTimestamp":"0",
+      "ICAO":"XXXX",
+      "IATA":"XXX",
+      "presentCityName":"Ratalona",
+      "location": {
+        "terminal":"T1",
+        "gate":"A12"
+      },
+      "actualArriveTimestamp":"0",
+      "status":"on-time",
+      "code":[
+        {
+          "companyName":"Carlos Airlines SL",
+          "flightNumber":"AB00000"
+        }
+      ]
+    }
+  ]
+}
