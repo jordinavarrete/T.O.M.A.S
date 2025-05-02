@@ -20,6 +20,9 @@ import android.net.wifi.ScanResult;
 import android.util.Log;
 
 import java.util.ArrayList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,5 +141,13 @@ public class MainActivity extends AppCompatActivity {
     private void connectToWifiAndGetData(ScanResult Network)
     {
         Log.e("WiFiScan", "Connecting to wifi network " + Network.SSID);
+    }
+
+    private Airport getAirport(String json, ObjectMapper mapper) {
+        try {
+            return mapper.readValue(json, Airport.class);
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
