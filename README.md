@@ -1,9 +1,9 @@
-<h1 align="center">Deep-Live-Cam</h1>
+<h1 align="center">T.O.M.A.S.</h1>
 
 <p align="center">
     Te Orienta Mejor Aunque Seaoscuro
 </p>
 
 <p align="center">
-  <img src="media/logo.png" alt="logo" width="800">
+  <img src="media/logo.png" alt="logo" width="400">
 </p>
