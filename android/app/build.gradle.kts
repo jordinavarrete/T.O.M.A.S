@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.jackson.databind)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.lifecycle.runtime.ktx)
