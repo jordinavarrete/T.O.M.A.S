@@ -194,6 +194,12 @@ public class MainActivity extends AppCompatActivity {
         boolean dataValid = false;
         _connected = false;
 
+        if(received == "")
+        {
+            Toast.makeText(this, "Empty payload, retrying", Toast.LENGTH_LONG).show();
+            BluetoothClient.Helper.Connect(this);
+        }
+
         // Start Server
 
     }
