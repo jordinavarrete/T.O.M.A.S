@@ -37,5 +37,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:exported="true"
+            android:label="FLIGHT INFO"
+            android:theme="@style/Theme.TOMAS" >
+        </activity>
     </application>
 </manifest>
