@@ -20,6 +20,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 
+import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -42,8 +44,14 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        String text = getIntent().getStringExtra("text");
-        TextView textView = findViewById(R.id.textViewDetail);
-        textView.setText(text);
+        Flight flight = (Flight) getIntent().getSerializableExtra("flight1");
+
+        if (flight != null) {
+            TextView statusText = findViewById(R.id.tvStatus);
+            statusText.setText(flight.getStatus());
+        } else {
+            Log.e("DetailActivity", "Flight object is null!");
+            Toast.makeText(this, "Error: no s'ha pogut carregar el vol", Toast.LENGTH_SHORT).show();
+        }
     }
 }

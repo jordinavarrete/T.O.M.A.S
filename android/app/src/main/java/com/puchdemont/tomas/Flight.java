@@ -1,8 +1,9 @@
 package com.puchdemont.tomas;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Flight {
+public class Flight implements Serializable {
     private String type;
     private String programmedArriveTimestamp;
     private String ICAO;
@@ -42,7 +43,7 @@ public class Flight {
     public void setCode(List<FlightCode> code) { this.code = code; }
 
     // Nested class for location
-    public static class Location {
+    public static class Location implements Serializable {
         private String terminal;
         private String gate;
 
@@ -54,7 +55,7 @@ public class Flight {
     }
 
     // Nested class for code
-    public static class FlightCode {
+    public static class FlightCode implements Serializable {
         private String companyName;
         private String flightNumber;
 
