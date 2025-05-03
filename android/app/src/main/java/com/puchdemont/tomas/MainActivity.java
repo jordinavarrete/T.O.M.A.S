@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     EjemploAdapter adapter;
+    Button forceAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
+        forceAdmin = findViewById(R.id.forceServerButton);
 
         /*
         // Airport airport = getAirport("", CURRENT_DATA);
