@@ -5,6 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.net.Uri;
+import android.net.wifi.WifiNetworkSpecifier;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.net.wifi.WifiManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -25,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -138,9 +148,150 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void connectToWifiAndGetData(ScanResult Network)
+    private boolean checkSystemWritePermission() {
+        boolean retVal = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            retVal = Settings.System.canWrite(this);
+            Log.d("TAG", "Can Write Settings: " + retVal);
+            if(retVal){
+                ///Permission granted by the user
+            }else{
+                //permission not granted navigate to permission screen
+                openAndroidPermissionsMenu();
+            }
+        }
+        return retVal;
+    }
+
+    private void openAndroidPermissionsMenu() {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+        intent.setData(Uri.parse("package:" + this.getPackageName()));
+        startActivity(intent);
+    }
+
+
+    private void connectToWifiAndGetData(ScanResult Network) {
+        try {
+            Log.d("WiFiScan", "Connecting to wifi network " + Network.SSID);
+
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+
+            String SSID = Network.SSID;
+            String PassWD = "12345678";
+
+
+            if (wifiManager != null) {
+                WifiManager.WifiLock wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "TOMAS_WIFI_LOCK");
+                wifiLock.acquire();
+
+                // Android Q and above
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                {
+                    if(!checkSystemWritePermission())
+                    {
+                        wifiManager.startScan();
+                        return;
+                    }
+
+                    WifiNetworkSpecifier specifier = new WifiNetworkSpecifier.Builder()
+                            .setSsid(SSID)
+                            .setWpa2Passphrase(PassWD)
+                            .build();
+
+                    NetworkRequest request = new NetworkRequest.Builder()
+                            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                            .setNetworkSpecifier(specifier)
+                            .build();
+
+                    ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                    ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(Network network) {
+                            // Bind process to this network
+                            cm.bindProcessToNetwork(network);
+                            DownloadDataAndDisplay();
+                        }
+                    };
+
+                    cm.requestNetwork(request, callback);
+                }
+                // Android 9 and below
+                else
+                {
+                    // Configure the Wi-Fi network
+                    WifiConfiguration wifiConfig = new WifiConfiguration();
+                    wifiConfig.SSID = "\"" + SSID + "\""; // Enclose SSID in quotes
+                    wifiConfig.preSharedKey = "\"" + PassWD + "\""; // Replace with the actual password
+
+                    // Add the network and connect
+                    int netId = wifiManager.addNetwork(wifiConfig);
+                    if (netId != -1) {
+                        wifiManager.disconnect();
+                        wifiManager.enableNetwork(netId, true);
+                        wifiManager.reconnect();
+                        Log.d("WiFiScan", "Successfully connected to " + Network.SSID);
+                        DownloadDataAndDisplay();
+                    } else {
+                        Log.e("WiFiScan", "Failed to add network configuration for " + Network.SSID);
+                    }
+                }
+                wifiLock.release();
+            } else {
+                Log.e("WiFiScan", "WifiManager is null, cannot connect to network");
+            }
+        } catch (Exception ex) {
+            Log.e("WiFiScan", "Error connecting to WiFi network: " + ex.getMessage());
+        }
+    }
+
+    // This method should be called after successfully connecting to a peer wifi network
+    private void DownloadDataAndDisplay()
     {
-        Log.e("WiFiScan", "Connecting to wifi network " + Network.SSID);
+        Log.e("WiFiScan", "Downloading data from the connected network");
+
+
+        // download
+
+
+
+
+    }
+
+    private void CreateOwnHotSpot()
+    {
+        String SSID = NET_IDENTIFIER + "#" + CURRENT_VERSION_ID + "#" + new Random().nextInt();
+        String PassWD = "12345678";
+
+
+        // Android 7 cannot hotspot, xd
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            WifiManager.LocalOnlyHotspotCallback callback = new WifiManager.LocalOnlyHotspotCallback() {
+                @Override
+                public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+                    super.onStarted(reservation);
+                    Log.d("Hotspot", "Hotspot started with SSID: ");
+                }
+
+                @Override
+                public void onStopped() {
+                    super.onStopped();
+                    Log.d("Hotspot", "Hotspot stopped");
+                }
+
+                @Override
+                public void onFailed(int reason) {
+                    super.onFailed(reason);
+                    Log.e("Hotspot", "Failed to start hotspot. Reason: " + reason);
+                }
+            };
+
+            wifiManager.startLocalOnlyHotspot(callback, null);
+        } else {
+            Log.e("Hotspot", "Hotspot creation is not supported on Android versions below Oreo.");
+        }
+
     }
 
     private Airport getAirport(String json, ObjectMapper mapper) {
