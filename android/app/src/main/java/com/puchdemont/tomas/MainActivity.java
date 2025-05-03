@@ -13,6 +13,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.view.View;
+import android.widget.ProgressBar;
+
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -54,12 +58,17 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     EjemploAdapter adapter;
+    private ProgressBar loadingPB;
+    private boolean isProgressVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        //ProgressBar
+        loadingPB = findViewById(R.id.progressBar);
 
         // Ajustes de bordes del sistema
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -261,6 +270,18 @@ public class MainActivity extends AppCompatActivity {
             return mapper.readValue(json, Airport.class);
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    public void toggle_progressBar() {
+        if (isProgressVisible) {
+            // Hide progress bar
+            loadingPB.setVisibility(View.GONE);
+            isProgressVisible = false;
+        } else {
+            // Show progress bar
+            loadingPB.setVisibility(View.VISIBLE);
+            isProgressVisible = true;
         }
     }
 }
