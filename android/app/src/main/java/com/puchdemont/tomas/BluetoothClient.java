@@ -19,17 +19,24 @@ public class BluetoothClient {
     public static class Helper {
 
         static MainActivity Activity;
+        static String Mac;
 
         @SuppressLint("MissingPermission")
         public static void Connect(String MAC, MainActivity activity) {
             Activity = activity;
+            Mac = MAC;
+        }
+
+        private static void _connect()
+        {
+
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
                 // Bluetooth is not available or not enabled
                 return;
             }
 
-            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(MAC);
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(Mac);
             BluetoothSocket socket = null;
 
             try {
@@ -68,11 +75,13 @@ public class BluetoothClient {
                     }
                 } catch (IOException e) {
                     Activity.LoadDataFromString(result);
+                    return;
                 }
+                _connect();
             } catch (Exception ex)
             {
                 ex.printStackTrace();
-                Activity.ConnectToServer();
+                _connect();
             }
             finally
             {

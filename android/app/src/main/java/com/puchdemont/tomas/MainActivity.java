@@ -162,12 +162,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     boolean _connected = false;
+
+
     public void ConnectToServer()
     {
         // if(_connected) return;
         _connected = true;
         BluetoothClient.Helper.Connect("A0:7D:9C:DE:FA:AF", this);
     }
+
 
     @Override
     protected void onResume() {
@@ -190,5 +193,8 @@ public class MainActivity extends AppCompatActivity {
     public void LoadDataFromString(String received) {
         boolean dataValid = false;
         _connected = false;
+
+        // Start Server
+
     }
 }
