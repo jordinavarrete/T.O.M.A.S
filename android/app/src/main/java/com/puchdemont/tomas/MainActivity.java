@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         ) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES, Manifest.permission.BLUETOOTH_SCAN}, 3343);
         } else {
-            BluetoothServer.Helper.initialise(this);
+            BluetoothClient.Helper.Connect(this);
         }
 
         // Ajustes de bordes del sistema
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     {
         // if(_connected) return;
         _connected = true;
-        BluetoothClient.Helper.Connect("A0:7D:9C:DE:FA:AF", this);
+        BluetoothClient.Helper.Connect( this);
     }
 
 
@@ -180,6 +180,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BluetoothClient.Helper.onDestroy();
     }
 
     private Airport getAirport(String json, ObjectMapper mapper) {
