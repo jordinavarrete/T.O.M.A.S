@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
 
-        /*
+        //Revisar aqui
         // Airport airport = getAirport("", CURRENT_DATA);
         ObjectMapper objectMapper = new ObjectMapper();
         Airport airport;
@@ -104,8 +104,127 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .collect(Collectors.toList());
         vuelosInfo.forEach(System.out::println);
-        */
 
+        String json = """
+                {
+                  "airportMetadata": {
+                    "ICAO": "LEBL",
+                    "IATA": "BCN",
+                    "presentName": "Aeroport El Prat-Josep Tarradellas",
+                    "lastUpdateTimestamp": "1714166400",
+                    "startUpdateTimestamp": "1714080000"
+                  },
+                  "flights": [
+                    {
+                      "type": "departure",
+                      "programmedArriveTimestamp": "1714188000",
+                      "ICAO": "LEBL",
+                      "IATA": "BCN",
+                      "presentCityName": "Madrid",
+                      "location": {
+                        "terminal": "T1",
+                        "gate": "B14"
+                      },
+                      "actualArriveTimestamp": "1714188600",
+                      "status": "on-time",
+                      "code": [
+                        {
+                          "companyName": "Iberia",
+                          "flightNumber": "IB123"
+                        },
+                        {
+                          "companyName": "British Airways",
+                          "flightNumber": "BA123"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "departure",
+                      "programmedArriveTimestamp": "1714189800",
+                      "ICAO": "LEBL",
+                      "IATA": "BCN",
+                      "presentCityName": "Paris",
+                      "location": {
+                        "terminal": "T2",
+                        "gate": "C32"
+                      },
+                      "actualArriveTimestamp": "1714190400",
+                      "status": "delayed",
+                      "code": [
+                        {
+                          "companyName": "Vueling",
+                          "flightNumber": "VY987"
+                        },
+                        {
+                          "companyName": "Air Europa",
+                          "flightNumber": "UX987"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "departure",
+                      "programmedArriveTimestamp": "1714193400",
+                      "ICAO": "LEBL",
+                      "IATA": "BCN",
+                      "presentCityName": "Rome",
+                      "location": {
+                        "terminal": "T1",
+                        "gate": "A20"
+                      },
+                      "actualArriveTimestamp": "1714194000",
+                      "status": "on-time",
+                      "code": [
+                        {
+                          "companyName": "Ryanair",
+                          "flightNumber": "R7A77"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "departure",
+                      "programmedArriveTimestamp": "1714195200",
+                      "ICAO": "LEBL",
+                      "IATA": "BCN",
+                      "presentCityName": "Paris",
+                      "location": {
+                        "terminal": "T2",
+                        "gate": "C45"
+                      },
+                      "actualArriveTimestamp": "1714195800",
+                      "status": "on-time",
+                      "code": [
+                        {
+                          "companyName": "Air France",
+                          "flightNumber": "AF1203"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "departure",
+                      "programmedArriveTimestamp": "1714197600",
+                      "ICAO": "LEBL",
+                      "IATA": "BCN",
+                      "presentCityName": "Amsterdam",
+                      "location": {
+                        "terminal": "T1",
+                        "gate": "A5"
+                      },
+                      "actualArriveTimestamp": "1714198200",
+                      "status": "delayed",
+                      "code": [
+                        {
+                          "companyName": "KLM Royal Dutch Airlines",
+                          "flightNumber": "KL875"
+                        },
+                        {
+                          "companyName": "Delta Airlines",
+                          "flightNumber": "DL875"
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """;
 
 
         // Lista de ejemplo
