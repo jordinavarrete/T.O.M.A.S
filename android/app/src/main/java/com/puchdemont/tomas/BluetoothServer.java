@@ -77,7 +77,7 @@ public class BluetoothServer {
             listen();
         }
 
-        public static void listen() {
+        private static void listen() {
 
             BluetoothSocket socket = null;
             // Keep listening until exception occurs or a socket is returned.

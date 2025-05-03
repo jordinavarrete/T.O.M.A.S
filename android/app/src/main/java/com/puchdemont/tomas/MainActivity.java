@@ -193,8 +193,14 @@ public class MainActivity extends AppCompatActivity {
     public void LoadDataFromString(String received) {
         boolean dataValid = false;
         _connected = false;
+        CURRENT_DATA_PAYLOAD = received;
 
         // Start Server
+        BluetoothClient.Helper.onDestroy();
+        BluetoothServer.Helper.initialise(this);
+    }
 
+    private void loadSamplePayload() {
+        LoadDataFromString(SampleJson.json);
     }
 }
