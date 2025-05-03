@@ -21,6 +21,11 @@ import java.nio.charset.StandardCharsets;
 
 public class NearbyServer {
 
+    public static class ConnectionData
+    {
+        public static final String ServiceId = "com.puchdemont.tomas.Padalustro";
+    }
+
     public static class Helper
     {
         static ConnectionsClient connectionsClient;
