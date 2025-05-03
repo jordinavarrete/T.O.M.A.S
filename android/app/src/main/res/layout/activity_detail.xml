@@ -66,59 +66,72 @@
             </LinearLayout>
 
             <!-- Flight Info Fields -->
-            <LinearLayout
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp"
-                android:background="?android:attr/selectableItemBackground">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Flight Number:" />
-
-                    <TextView
-                        android:id="@+id/tvFlightNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="--" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Status:" />
-
-                    <TextView
-                        android:id="@+id/tvStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="--" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Departure Section -->
             <androidx.cardview.widget.CardView
+                app:cardBackgroundColor="@color/cardview_color"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    app:layout_constraintTop_toBottomOf="@id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:text="Flight Number:" />
+
+                        <TextView
+                            android:id="@+id/tvFlightNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:text="Status:" />
+
+                        <TextView
+                            android:id="@+id/tvStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Departure Section -->
+            <androidx.cardview.widget.CardView
+                app:cardBackgroundColor="@color/cardview_color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
                 <LinearLayout
@@ -216,10 +229,11 @@
 
             <!-- Arrival Section -->
             <androidx.cardview.widget.CardView
+                app:cardBackgroundColor="@color/cardview_color"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
                 <LinearLayout
