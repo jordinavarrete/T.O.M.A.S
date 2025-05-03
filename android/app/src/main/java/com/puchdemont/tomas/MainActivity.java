@@ -1,46 +1,43 @@
 package com.puchdemont.tomas;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
-import android.net.Uri;
-import android.net.wifi.WifiNetworkSpecifier;
-import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.net.wifi.WifiManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
-import android.provider.Settings;
 import android.util.Log;
 
-import java.util.ArrayList;
+import java.io.OutputStream;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     private String NET_IDENTIFIER = "TOMASNET";
     private int CURRENT_VERSION_ID = -1;
-    private boolean CURRENT_DATA = false;
+    private ObjectMapper CURRENT_DATA = null;
+    private String CURRENT_DATA_PAYLOAD = null;
 
     RecyclerView recyclerView;
     EjemploAdapter adapter;
@@ -70,228 +67,121 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new EjemploAdapter(ejemplos);
         recyclerView.setAdapter(adapter);
+
+
+        // Register in onCreate or before discovery
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(receiver, filter);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+            }, 1);
+        }
+
+
+        // registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        wifiManager.startScan();
+        // WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        // wifiManager.startScan();
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+
+        bluetoothAdapter.startDiscovery();
+
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(wifiScanReceiver);
-    }
-
-    private final BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
-        @Override
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
-                handleScanResults();
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String name = device.getName();
+                String address = device.getAddress(); // Use this to connect
+
+                Log.d("Discovery", "Found: " + name + " [" + address + "]");
+                // Optionally auto-connect or show in a list
+
+
+                if (name != null && name.startsWith(NET_IDENTIFIER)) {
+                    if (name.chars().filter(ch -> ch == '#').count() == 2)
+                    {
+                        int current_ver = Integer.parseInt(name.split("#")[1]);
+                        if(current_ver > CURRENT_VERSION_ID) {
+                            connectToBluetoothDevice(device);
+                        }
+                        else {
+                            Log.d("WiFiScan", "BT Device "+ name +" is not newer than the current data (" + current_ver + " <= " + CURRENT_VERSION_ID + ")");
+                        }
+                    }
+                    else {
+                        Log.d("WiFiScan", "BT Device "+ name +" does not match the NET_ID#{NUM}#DEV_UUID pattern ");
+                    }
+                }
+                else {
+                    Log.d("WiFiScan", "BT Device "+ name +" does not start with " + NET_IDENTIFIER);
+                }
+
             }
         }
     };
 
-    private void handleScanResults() {
-        try {
-            ArrayList<ScanResult> candidates = new ArrayList<ScanResult>();
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-            if (wifiManager != null) {
-                List<ScanResult> wifiList = wifiManager.getScanResults();
-                for (ScanResult wifi : wifiList) {
-                    if (wifi.SSID.startsWith(NET_IDENTIFIER)) {
-                        if (wifi.SSID.chars().filter(ch -> ch == '#').count() == 2)
-                        {
-                            int current_ver = Integer.parseInt(wifi.SSID.split("#")[1]);
-                            if(current_ver > CURRENT_VERSION_ID) {
-                                candidates.add(wifi);
-                            }
-                            else {
-                                Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" is not newer than the current data (" + current_ver + " <= " + CURRENT_VERSION_ID + ")");
-                            }
-                        }
-                        else {
-                            Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" does not match the NET_ID#{NUM}#DEV_UUID pattern ");
-                        }
-                    }
-                    else {
-                        Log.d("WiFiScan", "Wifi network "+ wifi.SSID +" does not start with " + NET_IDENTIFIER);
-                    }
-                }
+    private void connectToBluetoothDevice(BluetoothDevice device) {
+        UUID uuid = UUID.fromString("969255c0-200a-11e0-ac64-c80d250c9a66");
 
-                if(candidates.isEmpty())
-                {
-                    Log.d("WiFiScan", "No compatible wifi versions found, will scan again");
-                    new android.os.Handler().postDelayed(wifiManager::startScan, 5000);
-                }
-                else
-                {
-                    Log.d("WiFiScan", "Found " + candidates.size() + " candidates");
-                    unregisterReceiver(wifiScanReceiver);
-                    connectToWifiAndGetData(candidates.get(0));
-                }
+        new Thread(() -> {
+            try {
+                BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid);
+                socket.connect(); // Blocking
+
+                OutputStream out = socket.getOutputStream();
+                CURRENT_DATA_PAYLOAD = out.toString();
+                Log.d("Bluetooth", "Got data:");
+                Log.d("Bluetooth", CURRENT_DATA_PAYLOAD);
+                socket.close();
+                runOnUiThread(() -> ProcessData());
+            } catch (IOException e) {
+                Log.e("Bluetooth", "Error connecting to device: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception ex) {
-            Log.e("WiFiScan", "Error handling WiFi scan results: " + ex.getMessage());
-        }
+        }).start();
     }
 
-    private boolean checkSystemWritePermission() {
-        boolean retVal = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            retVal = Settings.System.canWrite(this);
-            Log.d("TAG", "Can Write Settings: " + retVal);
-            if(retVal){
-                ///Permission granted by the user
-            }else{
-                //permission not granted navigate to permission screen
-                openAndroidPermissionsMenu();
-            }
-        }
-        return retVal;
-    }
-
-    private void openAndroidPermissionsMenu() {
-        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-        intent.setData(Uri.parse("package:" + this.getPackageName()));
-        startActivity(intent);
-    }
-
-
-    private void connectToWifiAndGetData(ScanResult Network) {
-        try {
-            Log.d("WiFiScan", "Connecting to wifi network " + Network.SSID);
-
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-
-            String SSID = Network.SSID;
-            String PassWD = "12345678";
-
-
-            if (wifiManager != null) {
-                WifiManager.WifiLock wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "TOMAS_WIFI_LOCK");
-                wifiLock.acquire();
-
-                // Android Q and above
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                {
-                    if(!checkSystemWritePermission())
-                    {
-                        wifiManager.startScan();
-                        return;
-                    }
-
-                    WifiNetworkSpecifier specifier = new WifiNetworkSpecifier.Builder()
-                            .setSsid(SSID)
-                            .setWpa2Passphrase(PassWD)
-                            .build();
-
-                    NetworkRequest request = new NetworkRequest.Builder()
-                            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                            .setNetworkSpecifier(specifier)
-                            .build();
-
-                    ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-                    ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
-                        @Override
-                        public void onAvailable(Network network) {
-                            // Bind process to this network
-                            cm.bindProcessToNetwork(network);
-                            DownloadDataAndDisplay();
-                        }
-                    };
-
-                    cm.requestNetwork(request, callback);
-                }
-                // Android 9 and below
-                else
-                {
-                    // Configure the Wi-Fi network
-                    WifiConfiguration wifiConfig = new WifiConfiguration();
-                    wifiConfig.SSID = "\"" + SSID + "\""; // Enclose SSID in quotes
-                    wifiConfig.preSharedKey = "\"" + PassWD + "\""; // Replace with the actual password
-
-                    // Add the network and connect
-                    int netId = wifiManager.addNetwork(wifiConfig);
-                    if (netId != -1) {
-                        wifiManager.disconnect();
-                        wifiManager.enableNetwork(netId, true);
-                        wifiManager.reconnect();
-                        Log.d("WiFiScan", "Successfully connected to " + Network.SSID);
-                        DownloadDataAndDisplay();
-                    } else {
-                        Log.e("WiFiScan", "Failed to add network configuration for " + Network.SSID);
-                    }
-                }
-                wifiLock.release();
-            } else {
-                Log.e("WiFiScan", "WifiManager is null, cannot connect to network");
-            }
-        } catch (Exception ex) {
-            Log.e("WiFiScan", "Error connecting to WiFi network: " + ex.getMessage());
-        }
-    }
-
-    // This method should be called after successfully connecting to a peer wifi network
-    private void DownloadDataAndDisplay()
+    public void ProcessData()
     {
-        Log.e("WiFiScan", "Downloading data from the connected network");
+        CURRENT_DATA = new ObjectMapper();
+        getAirport(CURRENT_DATA_PAYLOAD, CURRENT_DATA);
 
-
-        // download
-
-
-
-
+        // load data to UI //
     }
 
-    private void CreateOwnHotSpot()
+    private void ServeData()
     {
-        String SSID = NET_IDENTIFIER + "#" + CURRENT_VERSION_ID + "#" + new Random().nextInt();
-        String PassWD = "12345678";
+        
+    }
 
 
-        // Android 7 cannot hotspot, xd
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-            WifiManager.LocalOnlyHotspotCallback callback = new WifiManager.LocalOnlyHotspotCallback() {
-                @Override
-                public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-                    super.onStarted(reservation);
-                    Log.d("Hotspot", "Hotspot started with SSID: ");
-                }
-
-                @Override
-                public void onStopped() {
-                    super.onStopped();
-                    Log.d("Hotspot", "Hotspot stopped");
-                }
-
-                @Override
-                public void onFailed(int reason) {
-                    super.onFailed(reason);
-                    Log.e("Hotspot", "Failed to start hotspot. Reason: " + reason);
-                }
-            };
-
-            wifiManager.startLocalOnlyHotspot(callback, null);
-        } else {
-            Log.e("Hotspot", "Hotspot creation is not supported on Android versions below Oreo.");
-        }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // unregisterReceiver(wifiScanReceiver);
     }
 
     private Airport getAirport(String json, ObjectMapper mapper) {
