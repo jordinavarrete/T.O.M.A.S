@@ -15,6 +15,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentOnAttachListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 public class BluetoothClient {
     public static class Helper {
+        private static boolean discoveryStopped = false;
 
         static MainActivity Activity;
         static String Mac;
@@ -37,6 +39,7 @@ public class BluetoothClient {
 
         @SuppressLint("MissingPermission")
         public static void Connect(MainActivity activity) {
+            discoveryStopped = false;
             Activity = activity;
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -90,7 +93,6 @@ public class BluetoothClient {
                 try {
                     while ((line = reader.readLine()) != null) {
                         // Process the received data
-                        System.out.println("Received: " + line);
                         result += line + "\n";
                     }
                 } catch (IOException e) {
@@ -132,7 +134,8 @@ public class BluetoothClient {
             scanResult = result;
             startScan();
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                scanResult.onServerScanned(getNewestServer());
+                if(!discoveryStopped)
+                    scanResult.onServerScanned(getNewestServer());
             }, 8000);
         }
 
@@ -154,6 +157,7 @@ public class BluetoothClient {
         }
 
         public static void onDestroy() {
+            discoveryStopped = true;
             Activity.unregisterReceiver(receiver);
         }
     }
