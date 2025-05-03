@@ -12,6 +12,7 @@ activityCompose = "1.10.1"
 composeBom = "2024.04.01"
 activity = "1.10.1"
 constraintlayout = "2.1.4"
+playServicesNearby = "19.3.0"
 
 [libraries]
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonDatabind" }
@@ -32,6 +33,7 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+play-services-nearby = { group = "com.google.android.gms", name = "play-services-nearby", version.ref = "playServicesNearby" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
