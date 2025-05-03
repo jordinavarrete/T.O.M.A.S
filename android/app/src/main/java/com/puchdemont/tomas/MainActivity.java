@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     final private String NET_IDENTIFIER = "TOMASNET";
     private int CURRENT_VERSION_ID = -1;
-    private ObjectMapper CURRENT_DATA = null;
+    private Airport CURRENT_DATA = new Airport();
+    private final ObjectMapper Mapper = new ObjectMapper();
     public String CURRENT_DATA_PAYLOAD = "{\"content\": \"HELLO WORLD!\"}";
     final UUID CONNECTION_UUID = UUID.fromString("969255c0-200a-11e0-ac64-c80d250c9a66");
     boolean continueDiscovery = false; // Flag to control discovery
@@ -81,34 +83,13 @@ public class MainActivity extends AppCompatActivity {
         // Lista de ejemplo
 
 
-        Flight flight = new Flight();
-        flight.setStatus("Delayed");
-        flight.setIATA("VY65374");
-        flight.setICAO("VY65374");
-
-
-        Flight flight2 = new Flight();
-        flight2.setStatus("Delayed");
-        flight2.setIATA("VY9999");
-        flight2.setICAO("VY9999");
-
-        ArrayList<Flight> ejemplos = new ArrayList<>();
-        ejemplos.add(flight);
-        ejemplos.add(flight2);
-
-        //adapter = new EjemploAdapter(ejemplos, item -> {
-        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        //    intent.putExtra("text", item);
-        //    startActivity(intent);
-        //});
-
-        adapter = new EjemploAdapter(ejemplos, item -> {
+        adapter = new EjemploAdapter(new ArrayList<Flight>(), item -> {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
             intent.putExtra("flight", item);
             startActivity(intent);
         });
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -173,28 +154,34 @@ public class MainActivity extends AppCompatActivity {
         BluetoothClient.Helper.onDestroy();
     }
 
-    private Airport getAirport(String json, ObjectMapper mapper) {
-        try {
-            return mapper.readValue(json, Airport.class);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
     public void LoadDataFromString(String received) {
-        boolean dataValid = false;
-        _connected = false;
-        CURRENT_DATA_PAYLOAD = received;
-
-        if(received == "")
+        if(received.isEmpty())
         {
             Toast.makeText(this, "Empty payload, retrying", Toast.LENGTH_LONG).show();
             BluetoothClient.Helper.Connect(this);
+            return;
         }
 
-        // Start Server
-        BluetoothClient.Helper.onDestroy();
-        BluetoothServer.Helper.InitializeAndServe(this);
+        try {
+            CURRENT_DATA_PAYLOAD = received;
+            CURRENT_DATA = Mapper.readValue(received, Airport.class);
+
+            List<Flight> flights = CURRENT_DATA.getFlights();
+            adapter = new EjemploAdapter(flights, item -> {
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("flight", item);
+                startActivity(intent);
+            });
+            recyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+
+            // Start Server
+            BluetoothClient.Helper.onDestroy();
+            BluetoothServer.Helper.InitializeAndServe(this);
+        } catch (Exception ex)
+        {
+            Log.e("MainActivity", "Error parsing JSON", ex);
+        }
     }
 
     private void loadSamplePayload() {

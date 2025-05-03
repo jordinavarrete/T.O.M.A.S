@@ -3,8 +3,8 @@ package com.puchdemont.tomas;
 public class SampleJson {
     public static String json = "{\n" +
             "  \"airportMetadata\": {\n" +
-            "    \"ICAO\": \"LEBL\",\n" +
-            "    \"IATA\": \"BCN\",\n" +
+            "    \"icao\": \"LEBL\",\n" +
+            "    \"iata\": \"BCN\",\n" +
             "    \"presentName\": \"Aeroport El Prat-Josep Tarradellas\",\n" +
             "    \"lastUpdateTimestamp\": \"1714166400\",\n" +
             "    \"startUpdateTimestamp\": \"1714080000\"\n" +
@@ -13,8 +13,8 @@ public class SampleJson {
             "    {\n" +
             "      \"type\": \"departure\",\n" +
             "      \"programmedArriveTimestamp\": \"1714188000\",\n" +
-            "      \"ICAO\": \"LEBL\",\n" +
-            "      \"IATA\": \"BCN\",\n" +
+            "      \"icao\": \"LEBL\",\n" +
+            "      \"iata\": \"BCN\",\n" +
             "      \"presentCityName\": \"Madrid\",\n" +
             "      \"location\": {\n" +
             "        \"terminal\": \"T1\",\n" +
@@ -36,8 +36,8 @@ public class SampleJson {
             "    {\n" +
             "      \"type\": \"departure\",\n" +
             "      \"programmedArriveTimestamp\": \"1714189800\",\n" +
-            "      \"ICAO\": \"LEBL\",\n" +
-            "      \"IATA\": \"BCN\",\n" +
+            "      \"icao\": \"LEBL\",\n" +
+            "      \"iata\": \"BCN\",\n" +
             "      \"presentCityName\": \"Paris\",\n" +
             "      \"location\": {\n" +
             "        \"terminal\": \"T2\",\n" +
@@ -59,8 +59,8 @@ public class SampleJson {
             "    {\n" +
             "      \"type\": \"departure\",\n" +
             "      \"programmedArriveTimestamp\": \"1714193400\",\n" +
-            "      \"ICAO\": \"LEBL\",\n" +
-            "      \"IATA\": \"BCN\",\n" +
+            "      \"icao\": \"LEBL\",\n" +
+            "      \"iata\": \"BCN\",\n" +
             "      \"presentCityName\": \"Rome\",\n" +
             "      \"location\": {\n" +
             "        \"terminal\": \"T1\",\n" +
@@ -78,8 +78,8 @@ public class SampleJson {
             "    {\n" +
             "      \"type\": \"departure\",\n" +
             "      \"programmedArriveTimestamp\": \"1714195200\",\n" +
-            "      \"ICAO\": \"LEBL\",\n" +
-            "      \"IATA\": \"BCN\",\n" +
+            "      \"icao\": \"LEBL\",\n" +
+            "      \"iata\": \"BCN\",\n" +
             "      \"presentCityName\": \"Paris\",\n" +
             "      \"location\": {\n" +
             "        \"terminal\": \"T2\",\n" +
@@ -97,8 +97,8 @@ public class SampleJson {
             "    {\n" +
             "      \"type\": \"departure\",\n" +
             "      \"programmedArriveTimestamp\": \"1714197600\",\n" +
-            "      \"ICAO\": \"LEBL\",\n" +
-            "      \"IATA\": \"BCN\",\n" +
+            "      \"icao\": \"LEBL\",\n" +
+            "      \"iata\": \"BCN\",\n" +
             "      \"presentCityName\": \"Amsterdam\",\n" +
             "      \"location\": {\n" +
             "        \"terminal\": \"T1\",\n" +

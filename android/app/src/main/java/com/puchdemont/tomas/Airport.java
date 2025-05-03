@@ -1,10 +1,16 @@
 package com.puchdemont.tomas;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Airport {
     private AirportMetadata airportMetadata;
     private List<Flight> flights;
+
+    public Airport()
+    {
+        this.flights = new ArrayList<>();
+    }
 
     // Getters and setters
     public AirportMetadata getAirportMetadata() {

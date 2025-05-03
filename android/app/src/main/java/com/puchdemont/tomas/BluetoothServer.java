@@ -25,6 +25,7 @@ public class BluetoothServer {
         private static MainActivity Activity;
         private static String oldName = "Device";
         private static BluetoothAdapter adapter;
+        private static Thread listenerThread;
         public static void InitializeAndServe(MainActivity activity) {
             Activity = activity;
             adapter = BluetoothAdapter.getDefaultAdapter();
@@ -74,7 +75,12 @@ public class BluetoothServer {
                 e.printStackTrace();
             }
             mmServerSocket = tmp;
-            listen();
+            if(listenerThread != null)
+            {
+                listenerThread.interrupt();
+            }
+            listenerThread = new Thread(BluetoothServer.Helper::listen);
+            listenerThread.start();
         }
 
         private static void listen() {
@@ -112,6 +118,10 @@ public class BluetoothServer {
         @SuppressLint("MissingPermission")
         public static void StopServer()
         {
+            if(listenerThread != null)
+            {
+                listenerThread.interrupt();
+            }
             try {
                 if(!oldName.equals(""))  adapter.setName(oldName);
             } catch (Exception ex)
