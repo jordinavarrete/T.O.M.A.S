@@ -121,13 +121,34 @@ public class MainActivity extends AppCompatActivity {
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+
     }
-    
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 3343) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                NearbyServer.Helper.Initialize( this);
+                NearbyServer.Helper.StartAdvertising();
+            } else {
+                // Permission denied, show a message to the user
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        NearbyServer.Helper.Initialize( this);
-        NearbyServer.Helper.StartAdvertising();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 3343);
+        } else {
+            NearbyServer.Helper.Initialize(this);
+            NearbyServer.Helper.StartAdvertising();
+        }
     }
 
     @Override
