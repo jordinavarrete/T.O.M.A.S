@@ -43,7 +43,15 @@ public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull EjemploAdapter.ViewHolder holder, int position) {
-        holder.texto.setText(items.get(position));
+        String item = items.get(position);
+        holder.texto.setText(item);
+
+        // Configurar el listener para manejar el clic en cada elemento
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(item);
+            }
+        });
     }
 
     @Override
