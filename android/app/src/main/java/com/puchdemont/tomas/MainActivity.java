@@ -31,6 +31,8 @@ import java.io.OutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.Arrays;
@@ -79,24 +81,34 @@ public class MainActivity extends AppCompatActivity {
         //List<Flight> ejemploVuelos = Arrays.asList(flight1, flight2, flight3);
 
         // Lista de ejemplo
-        List<String> ejemplos = Arrays.asList(
-                "Elemento 1", "Elemento 2", "Elemento 3",
-                "Elemento 4", "Elemento 5"
-        );
+
+
+        Flight flight = new Flight();
+        flight.setStatus("Delayed");
+        flight.setIATA("VY65374");
+        flight.setICAO("VY65374");
+
+
+        Flight flight2 = new Flight();
+        flight2.setStatus("Delayed");
+        flight2.setIATA("VY9999");
+        flight2.setICAO("VY9999");
+
+        ArrayList<Flight> ejemplos = new ArrayList<>();
+        ejemplos.add(flight);
+        ejemplos.add(flight2);
+
+        //adapter = new EjemploAdapter(ejemplos, item -> {
+        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        //    intent.putExtra("text", item);
+        //    startActivity(intent);
+        //});
 
         adapter = new EjemploAdapter(ejemplos, item -> {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra("text", item);
+            intent.putExtra("flight", item);
             startActivity(intent);
         });
-
-        //Flight flight = new Flight();
-        //flight.setStatus("Delayed");
-        //adapter = new EjemploAdapter(ejemplos, item -> {
-        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        //    intent.putExtra("flight", item);
-        //    startActivity(intent);
-        //});
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 

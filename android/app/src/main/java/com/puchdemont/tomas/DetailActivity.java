@@ -44,17 +44,19 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        String text = getIntent().getStringExtra("text");
-        TextView textView = findViewById(R.id.textViewDetail);
-        textView.setText(text);
+        //String text = getIntent().getStringExtra("text");
+        //TextView textView = findViewById(R.id.textViewDetail);
+        //textView.setText(text);
 
-        //Flight flightdata = (Flight) getIntent().getSerializableExtra("flight");
-        //if (flight != null) {
-        //    TextView statusText = findViewById(R.id.tvStatus);
-        //    statusText.setText(flight.getStatus());
-        //} else {
-        //    Log.e("DetailActivity", "Flight object is null!");
-        //    Toast.makeText(this, "Error: no s'ha pogut carregar el vol", Toast.LENGTH_SHORT).show();
-        //}
+        //String v  = (String)getIntent().getSerializableExtra("flight");
+        //Log.d("AAAAA", v);
+        Flight flightdata = (Flight) getIntent().getSerializableExtra("flight");
+        if (flightdata != null) {
+            TextView statusText = findViewById(R.id.tvStatus);
+            statusText.setText(flightdata.getStatus());
+        } else {
+            Log.e("DetailActivity", "Flight object is null!");
+            Toast.makeText(this, "Error: no s'ha pogut carregar el vol", Toast.LENGTH_SHORT).show();
+        }
     }
 }
