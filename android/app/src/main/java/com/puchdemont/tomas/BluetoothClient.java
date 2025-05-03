@@ -48,10 +48,11 @@ public class BluetoothClient {
             scanNewestServer((device)->{
                 if(device == null) return;
                 Mac = device.getAddress();
-                _connect();
+                new Thread(BluetoothClient.Helper::_connect).start();
             });
         }
 
+        @SuppressLint("MissingPermission")
         private static void _connect()
         {
             if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
@@ -96,7 +97,8 @@ public class BluetoothClient {
                         result += line + "\n";
                     }
                 } catch (IOException e) {
-                    Activity.LoadDataFromString(result);
+                    String finalResult = result;
+                    Activity.runOnUiThread(() -> Activity.LoadDataFromString(finalResult));
                     return;
                 }
                 _connect();

@@ -113,10 +113,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    boolean hasDoneStart = false;
+
+
     @Override
     protected void onStart() {
         super.onStart();
 
+        if(hasDoneStart) return;
+        hasDoneStart = true;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
         || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
@@ -143,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-
         super.onStop();
         BluetoothServer.Helper.StopServer();
     }
