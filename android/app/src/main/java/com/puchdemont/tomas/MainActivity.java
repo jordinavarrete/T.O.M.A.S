@@ -3,6 +3,7 @@ package com.puchdemont.tomas;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,14 +34,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String NET_IDENTIFIER = "TOMASNET";
+    final private String NET_IDENTIFIER = "TOMASNET";
     private int CURRENT_VERSION_ID = -1;
     private ObjectMapper CURRENT_DATA = null;
-    private String CURRENT_DATA_PAYLOAD = null;
+    private String CURRENT_DATA_PAYLOAD = "{\"content\": \"HELLO WORLD!\"}";
+    final UUID CONNECTION_UUID = UUID.fromString("969255c0-200a-11e0-ac64-c80d250c9a66");
+    boolean continueDiscovery = false; // Flag to control discovery
 
     RecyclerView recyclerView;
     EjemploAdapter adapter;
@@ -97,15 +104,27 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         // wifiManager.startScan();
+        BeginScanForNewServers();
+        //ServeData();
+    }
 
+    private void BeginScanForNewServers()
+    {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
-
-        bluetoothAdapter.startDiscovery();
-
+        continueDiscovery = true;
+        new Thread(() -> {
+            while (continueDiscovery) {
+                bluetoothAdapter.startDiscovery();
+                try {
+                    Thread.sleep(1000); // Wait for 10 seconds before restarting discovery
+                } catch (InterruptedException e) {
+                    Log.e("Bluetooth", "Discovery thread interrupted: " + e.getMessage());
+                }
+            }
+        }).start();
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -115,8 +134,6 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String name = device.getName();
                 String address = device.getAddress(); // Use this to connect
-
-                Log.d("Discovery", "Found: " + name + " [" + address + "]");
                 // Optionally auto-connect or show in a list
 
 
@@ -125,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
                     {
                         int current_ver = Integer.parseInt(name.split("#")[1]);
                         if(current_ver > CURRENT_VERSION_ID) {
-                            connectToBluetoothDevice(device);
+                            Log.e("WiFiScan", "BT Device "+ name +" IS VALID, CONNECTING!");
+                            connectToBluetoothDevice(device, current_ver);
                         }
                         else {
                             Log.d("WiFiScan", "BT Device "+ name +" is not newer than the current data (" + current_ver + " <= " + CURRENT_VERSION_ID + ")");
@@ -136,23 +154,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    Log.d("WiFiScan", "BT Device "+ name +" does not start with " + NET_IDENTIFIER);
+                    if(name != null) Log.d("WiFiScan", "BT Device "+ name +" does not start with " + NET_IDENTIFIER);
                 }
-
             }
         }
     };
 
-    private void connectToBluetoothDevice(BluetoothDevice device) {
-        UUID uuid = UUID.fromString("969255c0-200a-11e0-ac64-c80d250c9a66");
-
+    private void connectToBluetoothDevice(BluetoothDevice device, int new_version_id) {
         new Thread(() -> {
             try {
-                BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid);
+                BluetoothSocket socket = device.createRfcommSocketToServiceRecord(CONNECTION_UUID);
                 socket.connect(); // Blocking
+                continueDiscovery = false;
 
                 OutputStream out = socket.getOutputStream();
                 CURRENT_DATA_PAYLOAD = out.toString();
+                CURRENT_VERSION_ID = new_version_id;
                 Log.d("Bluetooth", "Got data:");
                 Log.d("Bluetooth", CURRENT_DATA_PAYLOAD);
                 socket.close();
@@ -170,11 +187,40 @@ public class MainActivity extends AppCompatActivity {
         getAirport(CURRENT_DATA_PAYLOAD, CURRENT_DATA);
 
         // load data to UI //
+
+        ServeData();
     }
 
-    private void ServeData()
-    {
-        
+    private void ServeData() {
+
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 30000000); // in seconds
+        startActivity(discoverableIntent);
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
+            bluetoothAdapter.setName(NET_IDENTIFIER + "#" + CURRENT_VERSION_ID + "#" + new Random().nextInt());
+
+            new Thread(() -> {
+                Log.d("BluetoothServer", "Starting server...");
+                try {
+                    BluetoothServerSocket serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("TOMAS_SERVER", CONNECTION_UUID);
+                    Log.d("BluetoothServer", "Waiting for connection...");
+                    BluetoothSocket socket = serverSocket.accept(); // Blocking call
+
+                    Log.d("BluetoothServer", "Client connected: " + socket.getRemoteDevice().getName());
+                    OutputStream out = socket.getOutputStream();
+                    out.write(CURRENT_DATA_PAYLOAD.getBytes());
+                    out.flush();
+                    Log.d("BluetoothServer", "Data sent to client: " + CURRENT_DATA_PAYLOAD);
+
+                    socket.close();
+                    serverSocket.close();
+                } catch (IOException e) {
+                    Log.e("BluetoothServer", "Error in server: " + e.getMessage());
+                }
+            }).start();
+        }
     }
 
 
