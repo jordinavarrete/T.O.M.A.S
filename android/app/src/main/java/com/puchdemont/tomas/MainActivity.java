@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         forceAdmin = findViewById(R.id.forceServerButton);
+
+        forceAdmin.setOnClickListener(view -> loadSamplePayload());
 
         /*
         // Airport airport = getAirport("", CURRENT_DATA);
@@ -203,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Start Server
         BluetoothClient.Helper.onDestroy();
-        BluetoothServer.Helper.initialise(this);
+        BluetoothServer.Helper.InitializeAndServe(this);
     }
 
     private void loadSamplePayload() {
