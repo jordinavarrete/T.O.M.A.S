@@ -3,6 +3,7 @@ package com.puchdemont.tomas;
 
 // THIS IS THE PHONE THAT RECEIVES UPDATES
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 public class NearbyServer {
 
@@ -30,9 +32,24 @@ public class NearbyServer {
     {
         static ConnectionsClient connectionsClient;
         static ConnectionLifecycleCallback connectionLifecycleCallback;
-        public void Initialize(Context context)
+        static MainActivity Activity;
+        public static void Initialize(MainActivity activity)
         {
-            connectionsClient = Nearby.getConnectionsClient(context);
+            connectionsClient = Nearby.getConnectionsClient(activity);
+            Activity = activity;
+            PayloadCallback payloadCallback = new PayloadCallback() {
+                @Override
+                public void onPayloadReceived(String endpointId, Payload payload) {
+                    String received = new String(payload.asBytes(), StandardCharsets.UTF_8);
+                    Log.e("ServerReceiver", "Received: " + received);
+                    Activity.LoadDataFromString(received);
+                }
+
+                @Override
+                public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) { }
+            };
+
+
             connectionLifecycleCallback = new ConnectionLifecycleCallback() {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
@@ -43,39 +60,33 @@ public class NearbyServer {
                 @Override
                 public void onConnectionResult(String endpointId, ConnectionResolution result) {
                     if (result.getStatus().isSuccess()) {
-                        Log.d("Server", "Connected to client: " + endpointId);
+                        Log.d("ServerReceiver", "Connected to client: " + endpointId);
                     }
                 }
 
                 @Override
                 public void onDisconnected(String endpointId) {
-                    Log.d("Server", "Disconnected: " + endpointId);
+                    Log.d("ServerReceiver", "Disconnected: " + endpointId);
                 }
             };
-
-            PayloadCallback payloadCallback = new PayloadCallback() {
-                @Override
-                public void onPayloadReceived(String endpointId, Payload payload) {
-                    String received = new String(payload.asBytes(), StandardCharsets.UTF_8);
-                    Log.d("Server", "Received: " + received);
-                }
-
-                @Override
-                public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) { }
-            };
-
         }
 
-        public void StartAdvertising()
+        public static void StartAdvertising()
         {
+            connectionsClient.stopAllEndpoints();
             connectionsClient.startAdvertising(
-                    "TOMAS", // your endpoint name
-                    "ILoveTomas", // your service ID
+                    "CLIENT_" + String.valueOf(new Random().nextInt()), // your endpoint name
+                    ConnectionData.ServiceId, // your service ID
                     connectionLifecycleCallback,
                     new AdvertisingOptions.Builder()
                             .setStrategy(Strategy.P2P_STAR)
                             .build()
             );
+        }
+
+        public static void StopAdvertising()
+        {
+            connectionsClient.stopAdvertising();
         }
 
 

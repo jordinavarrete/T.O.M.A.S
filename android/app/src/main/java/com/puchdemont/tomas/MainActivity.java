@@ -126,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        NearbyServer.Helper.Initialize( this);
+        NearbyServer.Helper.StartAdvertising();
     }
 
     @Override
@@ -144,5 +146,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public void LoadDataFromString(String received) {
     }
 }
