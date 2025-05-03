@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 public class NearbyClient {
     public static class Helper
     {
+        private static boolean con = false;
+        private static boolean run = false;
         private static ConnectionsClient connectionsClient;
         private static EndpointDiscoveryCallback endpointDiscoveryCallback;
         private static ConnectionLifecycleCallback connectionLifecycleCallback;
@@ -29,6 +31,7 @@ public class NearbyClient {
         private static String connectedId;
 
         public static void initialise(Context context) {
+            if(run) return;
             connectionsClient = Nearby.getConnectionsClient(context);
 
             payloadCallback = new PayloadCallback() {
@@ -58,8 +61,12 @@ public class NearbyClient {
                 }
 
                 @Override
-                public void onDisconnected(String endpointId) { }
+                public void onDisconnected(String endpointId) {
+                    Log.i("KIG", "DISCONNECTED");
+                }
             };
+
+
 
             endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
                 @Override
@@ -84,6 +91,7 @@ public class NearbyClient {
                             .setStrategy(Strategy.P2P_STAR)
                             .build()
             );
+            run = true;
         }
 
         public static void sendPayload(String payload) {
