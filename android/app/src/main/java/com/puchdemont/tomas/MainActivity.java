@@ -20,6 +20,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -68,59 +70,45 @@ public class MainActivity extends AppCompatActivity {
         forceAdmin.setOnClickListener(view -> loadSamplePayload());
 
         /*
-        // Airport airport = getAirport("", CURRENT_DATA);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Airport airport;
-        try (InputStream is = getAssets().open("sample.json")) {
-            // 2) Parseja directament a Airport
-            airport = objectMapper.readValue(is, Airport.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error llegint sample.json", Toast.LENGTH_LONG).show();
-            return;
-        }
-        List<String> vuelosInfo = airport.getFlights().stream()
-                .map(f -> {
-                    // Sacamos los códigos de vuelo (p. ej. IB1234, UX5678, …)
-                    String codigos = f.getCode().stream()
-                            .map(c -> c.getCompanyName() + c.getFlightNumber())
-                            .collect(Collectors.joining(", "));
-                    // Construimos la línea de texto
-                    return String.format(
-                            "Vuelo %s: %s → %s | Programado: %s | Real: %s | Estado: %s | T%s-G%s",
-                            codigos,
-                            f.getICAO(),           // aeropuerto origen/destino
-                            f.getPresentCityName(),
-                            f.getProgrammedArriveTimestamp(),
-                            f.getActualArriveTimestamp() != null
-                                    ? f.getActualArriveTimestamp()
-                                    : "—",
-                            f.getStatus(),
-                            f.getLocation().getTerminal(),
-                            f.getLocation().getGate()
-                    );
-                })
-                .collect(Collectors.toList());
-        vuelosInfo.forEach(System.out::println);
-        */
+        Flight flight1 = new Flight();
+        flight1.setStatus("Delayed");
+        Flight flight2 = new Flight();
+        Flight flight3 = new Flight();
+         */
 
-
+        //List<Flight> ejemploVuelos = Arrays.asList(flight1, flight2, flight3);
 
         // Lista de ejemplo
-        List<String> ejemplos = Arrays.asList(
-                "Elemento 1", "Elemento 2", "Elemento 3",
-                "Elemento 4", "Elemento 5"
-        );
+
+
+        Flight flight = new Flight();
+        flight.setStatus("Delayed");
+        flight.setIATA("VY65374");
+        flight.setICAO("VY65374");
+
+
+        Flight flight2 = new Flight();
+        flight2.setStatus("Delayed");
+        flight2.setIATA("VY9999");
+        flight2.setICAO("VY9999");
+
+        ArrayList<Flight> ejemplos = new ArrayList<>();
+        ejemplos.add(flight);
+        ejemplos.add(flight2);
+
+        //adapter = new EjemploAdapter(ejemplos, item -> {
+        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        //    intent.putExtra("text", item);
+        //    startActivity(intent);
+        //});
 
         adapter = new EjemploAdapter(ejemplos, item -> {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra("text", item);
+            intent.putExtra("flight", item);
             startActivity(intent);
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
-
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

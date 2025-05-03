@@ -12,14 +12,14 @@ import java.util.List;
 
 public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHolder> {
     public interface OnItemClickListener {
-        void onItemClick(String item);
+        void onItemClick(Flight item);
     }
 
-    private List<String> items;
+    private List<Flight> items;
     private OnItemClickListener listener;
 
 
-    public EjemploAdapter(List<String> items, OnItemClickListener listener) {
+    public EjemploAdapter(List<Flight> items, OnItemClickListener listener) {
         this.items = items;
         this.listener = listener;
     }
@@ -43,8 +43,8 @@ public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull EjemploAdapter.ViewHolder holder, int position) {
-        String item = items.get(position);
-        holder.texto.setText(item);
+        Flight item = items.get(position);
+        holder.texto.setText(item.getIATA());
 
         // Configurar el listener para manejar el clic en cada elemento
         holder.itemView.setOnClickListener(v -> {

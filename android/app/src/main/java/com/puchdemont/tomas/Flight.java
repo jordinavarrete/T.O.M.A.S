@@ -1,15 +1,21 @@
 package com.puchdemont.tomas;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Flight {
+public class Flight implements Serializable {
     private String type;
     private String programmedArriveTimestamp;
+    private String programmedDepartTimestamp;
+
+    // Airport codes
     private String ICAO;
     private String IATA;
+
     private String presentCityName;
     private Location location;
     private String actualArriveTimestamp;
+    private String actualDepartTimestamp;
     private String status;
     private List<FlightCode> code;
 
@@ -19,6 +25,9 @@ public class Flight {
 
     public String getProgrammedArriveTimestamp() { return programmedArriveTimestamp; }
     public void setProgrammedArriveTimestamp(String programmedArriveTimestamp) { this.programmedArriveTimestamp = programmedArriveTimestamp; }
+
+    public String getProgrammedDepartTimestamp() { return programmedDepartTimestamp; }
+    public void setProgrammedDepartTimestamp(String programmedDepartTimestamp) { this.programmedDepartTimestamp = programmedDepartTimestamp; }
 
     public String getICAO() { return ICAO; }
     public void setICAO(String ICAO) { this.ICAO = ICAO; }
@@ -34,6 +43,8 @@ public class Flight {
 
     public String getActualArriveTimestamp() { return actualArriveTimestamp; }
     public void setActualArriveTimestamp(String actualArriveTimestamp) { this.actualArriveTimestamp = actualArriveTimestamp; }
+    public String getActualDepartTimestamp() { return actualDepartTimestamp; }
+    public void setActualDepartTimestamp(String actualDepartTimestamp) { this.actualDepartTimestamp = actualDepartTimestamp; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -42,7 +53,7 @@ public class Flight {
     public void setCode(List<FlightCode> code) { this.code = code; }
 
     // Nested class for location
-    public static class Location {
+    public static class Location implements Serializable {
         private String terminal;
         private String gate;
 
@@ -54,7 +65,7 @@ public class Flight {
     }
 
     // Nested class for code
-    public static class FlightCode {
+    public static class FlightCode implements Serializable {
         private String companyName;
         private String flightNumber;
 

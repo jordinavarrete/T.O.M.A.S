@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.2"
+agp = "8.7.1"
 jacksonDatabind = "2.15.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
