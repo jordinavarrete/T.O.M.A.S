@@ -1,16 +1,8 @@
 package com.puchdemont.tomas;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -21,24 +13,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import android.widget.Toast;
-import java.util.stream.Collectors;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     final private String NET_IDENTIFIER = "TOMASNET";
     private int CURRENT_VERSION_ID = -1;
     private ObjectMapper CURRENT_DATA = null;
-    private String CURRENT_DATA_PAYLOAD = "{\"content\": \"HELLO WORLD!\"}";
+    public String CURRENT_DATA_PAYLOAD = "{\"content\": \"HELLO WORLD!\"}";
     final UUID CONNECTION_UUID = UUID.fromString("969255c0-200a-11e0-ac64-c80d250c9a66");
     boolean continueDiscovery = false; // Flag to control discovery
 
@@ -65,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         ) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES, Manifest.permission.BLUETOOTH_SCAN}, 3343);
         } else {
-            BluetoothServer.Helper.initialise(this);
+            BluetoothServer.Helper.InitializeAndServe(this);
         }
 
         // Ajustes de bordes del sistema
@@ -145,6 +128,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+        else if (requestCode == 1234) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                BluetoothServer.Helper.Serve();
+            } else {
+                // Permission denied, show a message to the user
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -162,13 +153,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     boolean _connected = false;
-
-
     public void ConnectToServer()
     {
         // if(_connected) return;
-        _connected = true;
-        BluetoothClient.Helper.Connect("A0:7D:9C:DE:FA:AF", this);
+        //_connected = true;
+        //BluetoothClient.Helper.Connect("A0:7D:9C:DE:FA:AF", this);
+        BluetoothServer.Helper.InitializeAndServe(this);
     }
 
 
@@ -179,7 +169,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+
         super.onStop();
+        BluetoothServer.Helper.StopServer();
     }
 
     private Airport getAirport(String json, ObjectMapper mapper) {
