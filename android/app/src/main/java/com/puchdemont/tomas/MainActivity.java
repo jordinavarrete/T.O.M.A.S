@@ -69,10 +69,12 @@ public class MainActivity extends AppCompatActivity {
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
 
+        /*
         Flight flight1 = new Flight();
         flight1.setStatus("Delayed");
         Flight flight2 = new Flight();
         Flight flight3 = new Flight();
+         */
 
         //List<Flight> ejemploVuelos = Arrays.asList(flight1, flight2, flight3);
 
@@ -84,12 +86,19 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new EjemploAdapter(ejemplos, item -> {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra("flight1", item);
+            intent.putExtra("text", item);
             startActivity(intent);
         });
+
+        //Flight flight = new Flight();
+        //flight.setStatus("Delayed");
+        //adapter = new EjemploAdapter(ejemplos, item -> {
+        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        //    intent.putExtra("flight", item);
+        //    startActivity(intent);
+        //});
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
 
         // Register in onCreate or before discovery
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
