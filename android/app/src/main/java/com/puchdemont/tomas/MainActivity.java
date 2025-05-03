@@ -29,6 +29,9 @@ import android.provider.Settings;
 import android.util.Log;
 
 import java.util.ArrayList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -289,5 +292,13 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Hotspot", "Hotspot creation is not supported on Android versions below Oreo.");
         }
 
+    }
+
+    private Airport getAirport(String json, ObjectMapper mapper) {
+        try {
+            return mapper.readValue(json, Airport.class);
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
