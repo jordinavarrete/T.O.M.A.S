@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == 3343) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                NearbyClient.Helper.initialise( this);
+                ConnectToServer();
             } else {
                 // Permission denied, show a message to the user
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
@@ -143,13 +143,21 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        || ActivityCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED
+        || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES, Manifest.permission.BLUETOOTH_SCAN}, 3343);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN}, 3343);
         } else {
-            NearbyClient.Helper.initialise(this);
+            ConnectToServer();
         }
+    }
+
+    boolean _connected = false;
+    public void ConnectToServer()
+    {
+        // if(_connected) return;
+        _connected = true;
+        BluetoothClient.Helper.Connect("A0:7D:9C:DE:FA:AF", this);
     }
 
     @Override
@@ -172,9 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void LoadDataFromString(String received) {
         boolean dataValid = false;
-
-        if(dataValid) {
-            NearbyServer.Helper.StopAdvertising();
-        }
+        _connected = false;
+        ConnectToServer();
     }
 }

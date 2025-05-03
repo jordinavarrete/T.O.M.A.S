@@ -4,7 +4,9 @@ package com.puchdemont.tomas;
 // THIS IS THE PHONE THAT RECEIVES UPDATES
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.location.LocationManager;
 import android.util.Log;
 
 import com.google.android.gms.nearby.Nearby;
@@ -30,11 +32,25 @@ public class NearbyServer {
 
     public static class Helper
     {
+        public static boolean Running = false;
         static ConnectionsClient connectionsClient;
         static ConnectionLifecycleCallback connectionLifecycleCallback;
         static MainActivity Activity;
         public static void Initialize(MainActivity activity)
         {
+            if(Running) return;
+
+
+            boolean isBtOn = BluetoothAdapter.getDefaultAdapter().isEnabled();
+            LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+            boolean isLocationEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if(!isBtOn || !isLocationEnabled) {
+                Log.e("ServerReceiver", "Bluetooth or location is not enabled");
+                return;
+            }
+
+
+            Running = true;
             connectionsClient = Nearby.getConnectionsClient(activity);
             Activity = activity;
             PayloadCallback payloadCallback = new PayloadCallback() {
@@ -69,13 +85,15 @@ public class NearbyServer {
                     Log.d("ServerReceiver", "Disconnected: " + endpointId);
                 }
             };
+
+            StartAdvertising();
         }
 
         public static void StartAdvertising()
         {
             connectionsClient.stopAllEndpoints();
             connectionsClient.startAdvertising(
-                    "CLIENT_" + String.valueOf(new Random().nextInt()), // your endpoint name
+                    new String(new byte[]{97,98,99,100}, StandardCharsets.UTF_8), // your endpoint name
                     ConnectionData.ServiceId, // your service ID
                     connectionLifecycleCallback,
                     new AdvertisingOptions.Builder()
@@ -87,9 +105,7 @@ public class NearbyServer {
         public static void StopAdvertising()
         {
             connectionsClient.stopAdvertising();
+            Running = false;
         }
-
-
-
     }
 }
