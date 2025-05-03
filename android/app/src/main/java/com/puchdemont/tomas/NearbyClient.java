@@ -78,7 +78,7 @@ public class NearbyClient {
             };
 
             connectionsClient.startDiscovery(
-                    "",
+                    NearbyServer.ConnectionData.ServiceId,
                     endpointDiscoveryCallback,
                     new DiscoveryOptions.Builder()
                             .setStrategy(Strategy.P2P_STAR)
