@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.BLUETOOTH_CONNECT,
             }, 1);
         }
-
-
         // registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
