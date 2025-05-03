@@ -57,7 +57,7 @@ public class DetailActivity extends AppCompatActivity {
             statusText8.setText(flightdata.getLocation().getGate());
 
             TextView statusText9 = findViewById(R.id.tvArrDestinationAirport);
-            statusText9.setText(flightdata.getIATA());
+            statusText9.setText(flightdata.getIATA()+"/"+flightdata.getICAO());
 
             TextView statusText10 = findViewById(R.id.tvArrTerminal);
             statusText10.setText(flightdata.getDestinationTerminal());
