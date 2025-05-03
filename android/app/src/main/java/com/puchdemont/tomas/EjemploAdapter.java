@@ -11,11 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHolder> {
+    public interface OnItemClickListener {
+        void onItemClick(String item);
+    }
 
     private List<String> items;
+    private OnItemClickListener listener;
 
-    public EjemploAdapter(List<String> items) {
+
+    public EjemploAdapter(List<String> items, OnItemClickListener listener) {
         this.items = items;
+        this.listener = listener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -73,8 +73,12 @@ public class MainActivity extends AppCompatActivity {
                 "Elemento 4", "Elemento 5"
         );
 
+        adapter = new EjemploAdapter(ejemplos, item -> {
+            Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+            intent.putExtra("text", item);
+            startActivity(intent);
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new EjemploAdapter(ejemplos);
         recyclerView.setAdapter(adapter);
 
 
