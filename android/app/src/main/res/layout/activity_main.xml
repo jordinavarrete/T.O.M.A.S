@@ -11,12 +11,15 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary_vueling">
+        android:background="@color/primary_vueling"
+        app:logo="@drawable/logo"
+        app:contentInsetStartWithNavigation="0dp">
 
         <TextView
             android:id="@+id/custom_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="T.O.M.A.S"
             android:textColor="@color/black"
             android:textSize="20sp"
