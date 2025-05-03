@@ -71,38 +71,30 @@ public class MainActivity extends AppCompatActivity {
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
 
-        /*
-        Flight flight1 = new Flight();
-        flight1.setStatus("Delayed");
-        Flight flight2 = new Flight();
-        Flight flight3 = new Flight();
-         */
-
-        //List<Flight> ejemploVuelos = Arrays.asList(flight1, flight2, flight3);
-
-        // Lista de ejemplo
-
-
         Flight flight = new Flight();
         flight.setStatus("Delayed");
-        flight.setIATA("VY65374");
-        flight.setICAO("VY65374");
+        flight.setIATA("PMI");
+        flight.setICAO("LEPA");
+        flight.setDestinationCity("Palma");
+        flight.setPresentCityName("Barcelona");
+        flight.setCode(Arrays.asList(new Flight.FlightCode("Vueling", "VY8092")));
+        flight.setProgrammedArriveTimestamp("1714190400");
+        flight.setProgrammedDepartTimestamp("1714190400");
+        flight.setActualArriveTimestamp("1714190400");
+        flight.setActualDepartTimestamp("1714190400");
+        flight.setLocation(new Flight.Location("1", "B72"));
 
 
         Flight flight2 = new Flight();
         flight2.setStatus("Delayed");
-        flight2.setIATA("VY9999");
-        flight2.setICAO("VY9999");
+        flight2.setIATA("BCN");
+        flight2.setICAO("LEBL");
+        flight2.setCode(Arrays.asList(new Flight.FlightCode("Vueling", "VY2255")));
+
 
         ArrayList<Flight> ejemplos = new ArrayList<>();
         ejemplos.add(flight);
         ejemplos.add(flight2);
-
-        //adapter = new EjemploAdapter(ejemplos, item -> {
-        //    Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        //    intent.putExtra("text", item);
-        //    startActivity(intent);
-        //});
 
         adapter = new EjemploAdapter(ejemplos, item -> {
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
