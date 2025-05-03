@@ -30,6 +30,8 @@ import java.io.OutputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import android.widget.Toast;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +68,45 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
+
+        /*
+        // Airport airport = getAirport("", CURRENT_DATA);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Airport airport;
+        try (InputStream is = getAssets().open("sample.json")) {
+            // 2) Parseja directament a Airport
+            airport = objectMapper.readValue(is, Airport.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error llegint sample.json", Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<String> vuelosInfo = airport.getFlights().stream()
+                .map(f -> {
+                    // Sacamos los códigos de vuelo (p. ej. IB1234, UX5678, …)
+                    String codigos = f.getCode().stream()
+                            .map(c -> c.getCompanyName() + c.getFlightNumber())
+                            .collect(Collectors.joining(", "));
+                    // Construimos la línea de texto
+                    return String.format(
+                            "Vuelo %s: %s → %s | Programado: %s | Real: %s | Estado: %s | T%s-G%s",
+                            codigos,
+                            f.getICAO(),           // aeropuerto origen/destino
+                            f.getPresentCityName(),
+                            f.getProgrammedArriveTimestamp(),
+                            f.getActualArriveTimestamp() != null
+                                    ? f.getActualArriveTimestamp()
+                                    : "—",
+                            f.getStatus(),
+                            f.getLocation().getTerminal(),
+                            f.getLocation().getGate()
+                    );
+                })
+                .collect(Collectors.toList());
+        vuelosInfo.forEach(System.out::println);
+        */
+
+
 
         // Lista de ejemplo
         List<String> ejemplos = Arrays.asList(
