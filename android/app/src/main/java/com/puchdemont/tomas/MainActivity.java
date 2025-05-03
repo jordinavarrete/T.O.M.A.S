@@ -130,8 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == 3343) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                NearbyServer.Helper.Initialize( this);
-                NearbyServer.Helper.StartAdvertising();
+                NearbyClient.Helper.initialise( this);
             } else {
                 // Permission denied, show a message to the user
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
@@ -143,11 +142,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 3343);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        || ActivityCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES, Manifest.permission.BLUETOOTH_SCAN}, 3343);
         } else {
-            NearbyServer.Helper.Initialize(this);
-            NearbyServer.Helper.StartAdvertising();
+            NearbyClient.Helper.initialise(this);
         }
     }
 
