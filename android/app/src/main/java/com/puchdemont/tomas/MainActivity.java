@@ -133,7 +133,10 @@ public class MainActivity extends AppCompatActivity {
     {
         // if(_connected) return;
         _connected = true;
-        BluetoothClient.Helper.Connect( this);
+
+        NearbyServer.Helper.Initialize(this);
+        NearbyServer.Helper.StartAdvertising();
+        // BluetoothClient.Helper.Connect( this);
     }
 
 
@@ -176,6 +179,13 @@ public class MainActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
 
             // Start Server
+
+            // TODO:
+
+
+            NearbyServer.Helper.StopAdvertising();
+            NearbyClient.Helper.initialise(this);
+
             BluetoothClient.Helper.onDestroy();
             BluetoothServer.Helper.InitializeAndServe(this);
         } catch (Exception ex)

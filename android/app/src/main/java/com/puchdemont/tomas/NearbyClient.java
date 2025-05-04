@@ -30,9 +30,12 @@ public class NearbyClient {
         private static PayloadCallback payloadCallback;
         private static String connectedId;
 
-        public static void initialise(Context context) {
+        private static MainActivity Activity;
+
+        public static void initialise(MainActivity activity) {
+            Activity = activity;
             if(run) return;
-            connectionsClient = Nearby.getConnectionsClient(context);
+            connectionsClient = Nearby.getConnectionsClient(activity);
 
             payloadCallback = new PayloadCallback() {
                 @Override
@@ -56,7 +59,7 @@ public class NearbyClient {
                     if (result.getStatus().isSuccess()) {
                         connectionsClient.stopDiscovery();
                         connectedId = endpointId;
-                        sendPayload("Hello from client");
+                        sendPayload(Activity.CURRENT_DATA_PAYLOAD);
                     }
                 }
 
