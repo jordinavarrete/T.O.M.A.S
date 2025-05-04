@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         forceAdmin.setOnClickListener(view -> loadSamplePayload());
 
         adapter = new EjemploAdapter(new ArrayList<Flight>(), item -> {
-
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
             intent.putExtra("flight", item);
             startActivity(intent);
