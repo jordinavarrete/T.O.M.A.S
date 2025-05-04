@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         flight2.setIATA("BCN");
         flight2.setICAO("LEBL");
         flight2.setCode(Arrays.asList(new Flight.FlightCode("Vueling", "VY2255")));
+        flight2.setLocation(new Flight.Location("1", "B72"));
+
 
 
         ArrayList<Flight> ejemplos = new ArrayList<>();

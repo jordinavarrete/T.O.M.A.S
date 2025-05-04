@@ -25,26 +25,32 @@ public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView texto;
+        TextView flightCode;
+        TextView flightDeparture;
+        TextView flightGate;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            texto = itemView.findViewById(android.R.id.text1);
+            flightCode = itemView.findViewById(R.id.flightCodeTextView);
+            flightDeparture = itemView.findViewById(R.id.flightDepartureTextView);
+            flightGate = itemView.findViewById(R.id.flightGateTextView);
         }
     }
 
     @NonNull
     @Override
     public EjemploAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View vista = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_1, parent, false);
+        View vista = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_flight, parent, false);
         return new ViewHolder(vista);
     }
 
     @Override
     public void onBindViewHolder(@NonNull EjemploAdapter.ViewHolder holder, int position) {
         Flight item = items.get(position);
-        holder.texto.setText(item.getCode().get(0).getFlightNumber());
+        holder.flightCode.setText(item.getCode().get(0).getFlightNumber());
+        // Posar funcio
+        holder.flightDeparture.setText("Departure: " + "12:30");
+        holder.flightGate.setText("Gate: " + item.getLocation().getGate());
 
         // Configurar el listener para manejar el clic en cada elemento
         holder.itemView.setOnClickListener(v -> {
