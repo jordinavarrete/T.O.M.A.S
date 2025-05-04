@@ -101,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (requestCode == 1234) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                BluetoothServer.Helper.Serve();
+
+                // BluetoothServer.Helper.Serve();
             } else {
                 // Permission denied, show a message to the user
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
@@ -141,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
     {
         // if(_connected) return;
         _connected = true;
-
         NearbyServer.Helper.Initialize(this);
         NearbyServer.Helper.StartAdvertising();
         // BluetoothClient.Helper.Connect( this);
@@ -156,20 +156,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        BluetoothServer.Helper.StopServer();
+        // BluetoothServer.Helper.StopServer();
+        NearbyServer.Helper.StopAdvertising();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BluetoothClient.Helper.onDestroy();
+        // BluetoothClient.Helper.onDestroy();
+        NearbyServer.Helper.StopAdvertising();
     }
 
     public void LoadDataFromString(String received) {
         if(received.isEmpty())
         {
             Toast.makeText(this, "Empty payload, retrying", Toast.LENGTH_LONG).show();
-            BluetoothClient.Helper.Connect(this);
+            NearbyServer.Helper.StartAdvertising();
+            // BluetoothClient.Helper.Connect(this);
             return;
         }
 
@@ -194,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
             NearbyServer.Helper.StopAdvertising();
             NearbyClient.Helper.initialise(this);
 
-            BluetoothClient.Helper.onDestroy();
-            BluetoothServer.Helper.InitializeAndServe(this);
+            // BluetoothClient.Helper.onDestroy();
+            // BluetoothServer.Helper.InitializeAndServe(this);
         } catch (Exception ex)
         {
             Log.e("MainActivity", "Error parsing JSON", ex);
