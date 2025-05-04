@@ -70,6 +70,9 @@ public class Flight implements Serializable {
             gate = depGate;
         }
 
+        public Location()
+        {}
+
         public String getTerminal() { return terminal; }
         public void setTerminal(String terminal) { this.terminal = terminal; }
 
@@ -87,6 +90,8 @@ public class Flight implements Serializable {
             companyName = airline;
             flightNumber = number;
         }
+
+        public FlightCode() {}
 
         public String getCompanyName() { return companyName; }
         public void setCompanyName(String companyName) { this.companyName = companyName; }
