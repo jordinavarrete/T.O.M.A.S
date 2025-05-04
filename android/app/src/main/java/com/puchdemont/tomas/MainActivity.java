@@ -157,14 +157,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         // BluetoothServer.Helper.StopServer();
-        NearbyServer.Helper.StopAdvertising();
+        // NearbyServer.Helper.StopAdvertising();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // BluetoothClient.Helper.onDestroy();
-        NearbyServer.Helper.StopAdvertising();
+        // NearbyServer.Helper.StopAdvertising();
     }
 
     public void LoadDataFromString(String received) {
