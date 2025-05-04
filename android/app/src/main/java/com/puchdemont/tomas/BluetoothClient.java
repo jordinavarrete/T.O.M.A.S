@@ -1,5 +1,6 @@
 package com.puchdemont.tomas;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentOnAttachListener;
@@ -31,11 +33,10 @@ public class BluetoothClient {
     public static class Helper {
         private static boolean discoveryStopped = false;
 
+        private final static String LOG_KEY = "BluetoothClient";
+
         static MainActivity Activity;
-        static String Mac;
         private static BluetoothAdapter bluetoothAdapter;
-        private static ArrayList<BluetoothDevice> scannedDevices = new ArrayList<>();
-        private static ScanResult scanResult = null;
 
         @SuppressLint("MissingPermission")
         public static void Connect(MainActivity activity) {
@@ -44,34 +45,34 @@ public class BluetoothClient {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             activity.registerReceiver(receiver, filter);
+            Log.d(LOG_KEY, "Enabling device discovery...");
+            bluetoothAdapter.startDiscovery();
 
-            scanNewestServer((device)->{
-                if(device == null) return;
-                Mac = device.getAddress();
-                new Thread(BluetoothClient.Helper::_connect).start();
-            });
         }
 
         @SuppressLint("MissingPermission")
-        private static void _connect()
+        private static void _connectTo(BluetoothDevice device)
         {
+            Log.e(LOG_KEY, "Connecting to " + device.getAddress() + "...");
             if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
                 // Bluetooth is not available or not enabled
                 return;
             }
 
-            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(Mac);
             BluetoothSocket socket = null;
 
             try {
                 // Use a well-known UUID for SPP (Serial Port Profile)
                 UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+                Log.d(LOG_KEY, "Attempting to get socket from UUID...");
                 socket = device.createRfcommSocketToServiceRecord(uuid);
+                Log.d(LOG_KEY, "Attempting to connect to socket...");
                 socket.connect();
                 ReadFromSocket(socket);
 
                 // Connection successful
             } catch (IOException e) {
+                Log.e(LOG_KEY, "An error occurred while connecting to server socket");
                 e.printStackTrace();
                 // Handle connection failure
                 if (socket != null) {
@@ -91,21 +92,24 @@ public class BluetoothClient {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
                 String result = "";
+                Log.d(LOG_KEY, "Begin readline of socket...");
                 try {
                     while ((line = reader.readLine()) != null) {
                         // Process the received data
                         result += line + "\n";
                     }
                 } catch (IOException e) {
+                    Log.d(LOG_KEY, "IOException thrown, socket probably closed and read can be considered finished");
                     String finalResult = result;
                     Activity.runOnUiThread(() -> Activity.LoadDataFromString(finalResult));
                     return;
                 }
-                _connect();
+                Connect(Activity);
             } catch (Exception ex)
             {
+                Log.d(LOG_KEY, "Reading from socket failed");
                 ex.printStackTrace();
-                _connect();
+                Connect(Activity);
             }
             finally
             {
@@ -123,47 +127,40 @@ public class BluetoothClient {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    String a = device.getName();
-                    if(a!=null) {
-                        Log.d("BT", a);
-                        scannedDevices.add(device);
+                    String name = null;
+                    String currentName = null;
+                    try {
+                        name = device.getName();
+                        currentName = bluetoothAdapter.getName();
+                        Log.d(LOG_KEY, "Found device: " + name + " - " + device.getAddress());
+                    } catch (SecurityException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                    if(name != null && name.startsWith("TOMASNET") && !name.equals(currentName))
+                    {
+                        _connectTo(device);
+                        try {
+                            bluetoothAdapter.cancelDiscovery();
+                        } catch (SecurityException ex)
+                        {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
         };
 
-        public static void scanNewestServer(ScanResult result) {
-            scanResult = result;
-            startScan();
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                if(!discoveryStopped)
-                    scanResult.onServerScanned(getNewestServer());
-            }, 8000);
-        }
 
         @SuppressLint("MissingPermission")
-        public static void startScan() {
-            scannedDevices.clear();
-            bluetoothAdapter.startDiscovery();
-        }
-
-        @SuppressLint("MissingPermission")
-        private static BluetoothDevice getNewestServer() {
-            bluetoothAdapter.cancelDiscovery();
-
-            for(BluetoothDevice d : scannedDevices) {
-                String name = d.getName();
-                if(name.startsWith("TOMASNET")) return d;
-            }
-            return null;
-        }
-
         public static void onDestroy() {
-            discoveryStopped = true;
-            Activity.unregisterReceiver(receiver);
+            try {
+                bluetoothAdapter.cancelDiscovery();
+                Activity.unregisterReceiver(receiver);
+            } catch (Exception ex)
+            {
+
+            }
         }
-    }
-    public interface ScanResult {
-        void onServerScanned(BluetoothDevice device);
     }
 }
