@@ -20,8 +20,7 @@
             android:layout_height="wrap_content"
             android:text="CODE"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textStyle="bold" />
 
         <!-- Fila con hora de salida y puerta -->
         <LinearLayout
@@ -35,8 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="12:30"
-                android:textSize="14sp"
-                android:textColor="@android:color/black" />
+                android:textSize="14sp" />
 
             <!-- Espaciador flexible -->
             <View
@@ -49,8 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gate A5"
-                android:textSize="14sp"
-                android:textColor="@android:color/black" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
