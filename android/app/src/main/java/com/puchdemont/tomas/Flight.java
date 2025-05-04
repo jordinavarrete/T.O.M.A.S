@@ -11,7 +11,8 @@ public class Flight implements Serializable {
     // Airport codes
     private String ICAO;
     private String IATA;
-
+    private String destinationCity;
+    private String destinationTerminal;
     private String presentCityName;
     private Location location;
     private String actualArriveTimestamp;
@@ -35,6 +36,12 @@ public class Flight implements Serializable {
     public String getIATA() { return IATA; }
     public void setIATA(String IATA) { this.IATA = IATA; }
 
+    public String getDestinationCity() { return destinationCity; }
+    public void setDestinationCity(String destinationCity) { this.destinationCity = destinationCity; }
+
+    public String getDestinationTerminal() { return destinationTerminal; }
+    public void setDestinationTerminal(String destinationCity) { this.destinationTerminal = destinationTerminal; }
+
     public String getPresentCityName() { return presentCityName; }
     public void setPresentCityName(String presentCityName) { this.presentCityName = presentCityName; }
 
@@ -57,6 +64,12 @@ public class Flight implements Serializable {
         private String terminal;
         private String gate;
 
+        public Location(String depTerminal, String depGate)
+        {
+            terminal = depTerminal;
+            gate = depGate;
+        }
+
         public String getTerminal() { return terminal; }
         public void setTerminal(String terminal) { this.terminal = terminal; }
 
@@ -68,6 +81,12 @@ public class Flight implements Serializable {
     public static class FlightCode implements Serializable {
         private String companyName;
         private String flightNumber;
+
+        public FlightCode(String airline, String number)
+        {
+            companyName = airline;
+            flightNumber = number;
+        }
 
         public String getCompanyName() { return companyName; }
         public void setCompanyName(String companyName) { this.companyName = companyName; }

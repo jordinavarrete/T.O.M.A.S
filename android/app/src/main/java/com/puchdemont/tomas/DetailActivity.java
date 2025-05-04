@@ -1,59 +1,66 @@
 package com.puchdemont.tomas;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
-import android.net.Uri;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiNetworkSpecifier;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DetailActivity extends AppCompatActivity {
+    private String getProgrammedHourMinute(String timestamp) {
+        long epochSeconds = Long.parseLong(timestamp);
+        Instant instant = Instant.ofEpochSecond(epochSeconds);
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault()); // O especifica un fus horari concret
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return dateTime.format(formatter);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        //String text = getIntent().getStringExtra("text");
-        //TextView textView = findViewById(R.id.textViewDetail);
-        //textView.setText(text);
-
-        //String v  = (String)getIntent().getSerializableExtra("flight");
-        //Log.d("AAAAA", v);
         Flight flightdata = (Flight) getIntent().getSerializableExtra("flight");
         if (flightdata != null) {
-            TextView statusText = findViewById(R.id.tvStatus);
-            statusText.setText(flightdata.getStatus());
+            TextView statusText = findViewById(R.id.tvFlightNumber);
+            statusText.setText(flightdata.getCode().get(0).getFlightNumber());
+
+            TextView statusText1 = findViewById(R.id.tvDestination);
+            statusText1.setText(flightdata.getDestinationCity());
+
+            TextView statusText2 = findViewById(R.id.tvStatus);
+            statusText2.setText(flightdata.getStatus());
+
+            TextView statusText3 = findViewById(R.id.tvDeptScheduled);
+            statusText3.setText(getProgrammedHourMinute(flightdata.getProgrammedDepartTimestamp()));
+
+            TextView statusText4 = findViewById(R.id.tvDeptEstimated);
+            statusText4.setText(getProgrammedHourMinute(flightdata.getActualArriveTimestamp()));
+
+            TextView statusText5 = findViewById(R.id.tvArrScheduled);
+            statusText5.setText(getProgrammedHourMinute(flightdata.getProgrammedArriveTimestamp()));
+
+            TextView statusText6 = findViewById(R.id.tvArrEstimated);
+            statusText6.setText(getProgrammedHourMinute(flightdata.getActualArriveTimestamp()));
+
+            TextView statusText7 = findViewById(R.id.tvDeptTerminal);
+            statusText7.setText(flightdata.getLocation().getTerminal());
+
+            TextView statusText8 = findViewById(R.id.tvDeptGate);
+            statusText8.setText(flightdata.getLocation().getGate());
+
+            TextView statusText9 = findViewById(R.id.tvArrDestinationAirport);
+            statusText9.setText(flightdata.getIATA()+"/"+flightdata.getICAO());
+
+            TextView statusText10 = findViewById(R.id.tvArrTerminal);
+            statusText10.setText(flightdata.getDestinationTerminal());
         } else {
             Log.e("DetailActivity", "Flight object is null!");
             Toast.makeText(this, "Error: no s'ha pogut carregar el vol", Toast.LENGTH_SHORT).show();

@@ -44,7 +44,7 @@ public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull EjemploAdapter.ViewHolder holder, int position) {
         Flight item = items.get(position);
-        holder.texto.setText(item.getIATA());
+        holder.texto.setText(item.getCode().get(0).getFlightNumber());
 
         // Configurar el listener para manejar el clic en cada elemento
         holder.itemView.setOnClickListener(v -> {

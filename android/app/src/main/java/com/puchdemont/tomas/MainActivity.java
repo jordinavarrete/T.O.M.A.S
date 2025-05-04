@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import android.view.View;
+import android.widget.ProgressBar;
+
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     EjemploAdapter adapter;
     Button forceAdmin;
+    private ProgressBar loadingPB;
+    private boolean isProgressVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             BluetoothClient.Helper.Connect(this);
         }
+        //ProgressBar
+        loadingPB = findViewById(R.id.progressBar);
 
         // Ajustes de bordes del sistema
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -71,19 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
         forceAdmin.setOnClickListener(view -> loadSamplePayload());
 
-        /*
-        Flight flight1 = new Flight();
-        flight1.setStatus("Delayed");
-        Flight flight2 = new Flight();
-        Flight flight3 = new Flight();
-         */
-
-        //List<Flight> ejemploVuelos = Arrays.asList(flight1, flight2, flight3);
-
-        // Lista de ejemplo
-
-
         adapter = new EjemploAdapter(new ArrayList<Flight>(), item -> {
+
             Intent intent = new Intent(MainActivity.this, DetailActivity.class);
             intent.putExtra("flight", item);
             startActivity(intent);
@@ -190,5 +187,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadSamplePayload() {
         LoadDataFromString(SampleJson.json);
+    }
+
+    public void toggle_progressBar() {
+        if (isProgressVisible) {
+            // Hide progress bar
+            loadingPB.setVisibility(View.GONE);
+            isProgressVisible = false;
+        } else {
+            // Show progress bar
+            loadingPB.setVisibility(View.VISIBLE);
+            isProgressVisible = true;
+        }
     }
 }
