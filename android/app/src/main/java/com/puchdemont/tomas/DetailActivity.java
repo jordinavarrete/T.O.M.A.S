@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DetailActivity extends AppCompatActivity {
-    private String getProgrammedHourMinute(String timestamp) {
+    public static String getTimeHourMinute(String timestamp) {
         long epochSeconds = Long.parseLong(timestamp);
         Instant instant = Instant.ofEpochSecond(epochSeconds);
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault()); // O especifica un fus horari concret
@@ -39,16 +39,16 @@ public class DetailActivity extends AppCompatActivity {
             statusText2.setText(flightdata.getStatus());
 
             TextView statusText3 = findViewById(R.id.tvDeptScheduled);
-            statusText3.setText(getProgrammedHourMinute(flightdata.getProgrammedDepartTimestamp()));
+            statusText3.setText(getTimeHourMinute(flightdata.getProgrammedDepartTimestamp()));
 
             TextView statusText4 = findViewById(R.id.tvDeptEstimated);
-            statusText4.setText(getProgrammedHourMinute(flightdata.getActualArriveTimestamp()));
+            statusText4.setText(getTimeHourMinute(flightdata.getActualArriveTimestamp()));
 
             TextView statusText5 = findViewById(R.id.tvArrScheduled);
-            statusText5.setText(getProgrammedHourMinute(flightdata.getProgrammedArriveTimestamp()));
+            statusText5.setText(getTimeHourMinute(flightdata.getProgrammedArriveTimestamp()));
 
             TextView statusText6 = findViewById(R.id.tvArrEstimated);
-            statusText6.setText(getProgrammedHourMinute(flightdata.getActualArriveTimestamp()));
+            statusText6.setText(getTimeHourMinute(flightdata.getActualArriveTimestamp()));
 
             TextView statusText7 = findViewById(R.id.tvDeptTerminal);
             statusText7.setText(flightdata.getLocation().getTerminal());

@@ -48,8 +48,7 @@ public class EjemploAdapter extends RecyclerView.Adapter<EjemploAdapter.ViewHold
     public void onBindViewHolder(@NonNull EjemploAdapter.ViewHolder holder, int position) {
         Flight item = items.get(position);
         holder.flightCode.setText(item.getCode().get(0).getFlightNumber());
-        // Posar funcio
-        holder.flightDeparture.setText("Departure: " + "12:30");
+        holder.flightDeparture.setText("Departure: " + DetailActivity.getTimeHourMinute(item.getProgrammedDepartTimestamp()));
         holder.flightGate.setText("Gate: " + item.getLocation().getGate());
 
         // Configurar el listener para manejar el clic en cada elemento
